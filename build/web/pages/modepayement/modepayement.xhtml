@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../templates/layout.xhtml"
+                xmlns:bnu="http://bootsfaces.net/ui"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="contenu">
+        <h:form id="modepayement">
+        <p:panel  header="formulaire Type de contrat">
+            <h:panelGrid id="pgrid1" columns="2" style="vertical-align: top;">
+                <p:panel id="formPanel" header="Edition" style="border-color: white; height: 380px; width: 390px; vertical-align: top;">
+                    <p:outputPanel autoUpdate="true">
+                        <h:panelGrid id="formGrid" columns="2" cellpadding="2">
+                            <h:outputText value="Libelle:" style="margin-left: 3px"/>
+                            <p:inputText value="#{appuserBean.formObject.userLogin}"  style="width: 230px;" maxlength="100"/>
+                         
+                            <h:outputText value="Actif:"/>
+                            <p:selectOneRadio value="#{appuserBean.formObject.actif}">
+                                <f:selectItem itemLabel="Oui" itemValue="Y" />
+                                <f:selectItem itemLabel="Non" itemValue="N" />
+                            </p:selectOneRadio>
+
+                            <h:outputText value=""/>
+                            <h:panelGrid columns="2" cellpadding="0" style="margin-left: 40px; text-align: right;"  >
+                                <p:commandButton value="Effacer" actionListener="#{appuserBean.resetForm()}" style="margin-left: 0px;" icon="ui-icon-arrow-1-w"/>
+                                <p:commandButton value="Valider" actionListener="#{appuserBean.valider()}" style="margin-left: 0px;" update="@(.ui-datatable)" icon="ui-icon-check" />
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </p:outputPanel>
+                </p:panel>
+                <p:panel id="gridPanel" style="border-color: white; height: 380px; vertical-align: top;">
+                    <p:dataTable id="grid" value="#{appuserBean.dataList}" paginatorAlwaysVisible="false" var="appUser" styleClass="datatable" selectionMode="single" selection="#{appuserBean.selectedObject}" rowKey="#{appUser.userId}" paginator="true" rows="10" emptyMessage="aucun enregistrement dans la base" resizableColumns="true">
+                        <p:ajax event="rowSelect" listener="#{appuserBean.loadSelected()}" />
+                    <p:column headerText="Id" style="width: 30px;">
+                            <h:outputText value="#{appUser.userId}" />
+                        </p:column>
+                        <p:column headerText="Libellé" style="width: 70%;">
+                            <h:outputText value="#{appUser.userLogin}" />
+                        </p:column>
+                    <f:facet name="footer">
+                        <center>
+                    
+                            <p:commandButton styleClass="button" id="refreshBtn" value="Actualiser" actionListener="#{appuserBean.refreshGrid}" update="grid" icon="ui-icon-refresh" />
+
+                        </center>
+
+                            <p:dialog widgetVar="confirmation" header="Suppression" width="400">
+                                <p:panel style="height: 30px; border: none;" >
+                                    <h:outputText value="Etes-vous sûr de vouloir supprimer cet enregistrement? Attention cette opération est irréversible!" />
+                                </p:panel>
+                                <p:commandButton id="deleteBtn" value="Oui" actionListener="#{appuserBean.delete()}"  update="grid" oncomplete="confirmation.hide()" icon="ui-icon-trash" style="margin-top: 20px;"/>
+                                <p:commandButton value="Non" type="button" onclick="confirmation.hide()" />
+                            </p:dialog>
+                        </f:facet>
+                    </p:dataTable>
+                    <p:blockUI block="gridPanel" trigger="grid:refreshBtn" >
+                        Traitement encours...<br/>
+                        <p:graphicImage library="images" value="/resources/images/ajax-loader.gif"/>
+                    </p:blockUI>
+                </p:panel>
+
+            </h:panelGrid>
+        </p:panel>
+        </h:form>
+    </ui:define>
+
+</ui:composition>
